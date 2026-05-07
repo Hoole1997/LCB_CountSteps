@@ -177,13 +177,13 @@ fun LcbStepsApp(viewModel: LcbAppViewModel = viewModel()) {
                         onLanguageSelected = viewModel::setLanguage,
                         onFeedback = {
                             val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("mailto:")
+                                data = Uri.parse("mailto:walaa98alhasan@gmail.com")
                                 putExtra(Intent.EXTRA_SUBJECT, "Count Steps feedback")
                             }
                             runCatching { context.startActivity(intent) }
                         },
                         onPrivacyPolicy = {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://example.com/privacy"))
+                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://walaa98alhasan.com/privacy.html"))
                             runCatching { context.startActivity(intent) }
                         },
                     )

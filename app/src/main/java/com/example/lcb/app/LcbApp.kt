@@ -4,14 +4,14 @@ import com.blankj.utilcode.util.LogUtils
 import com.example.lcb.app.ad.LcbAdInitializer
 import net.corekit.metrics.adjust.AdjustTracker
 
-class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
+class LcbApp : com.stepwise.pedometer.gostep.Rc4w4wk8() {
 
     companion object {
 
         var lcbApp: LcbApp? = null
 
         fun backLaunchActivity() {
-            lcbApp?.smartbackuptoolsignal()
+            lcbApp?.autocenter()
         }
     }
 
@@ -19,7 +19,7 @@ class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
         super.onCreate()
         lcbApp = this
         LcbAdInitializer.initialize(this)
-        this.maxquicklitememory {isOrganic, network, campaign, adgroup, creative, jsonResponse ->
+        this.primememory { isOrganic, network, campaign, adgroup, creative, jsonResponse ->
             AdjustTracker.init(
                 context = applicationContext,
                 network = network,
@@ -33,14 +33,16 @@ class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
 
     }
 
-    override fun prodailysmartmemory(): Class<in Any>? {
-        return MainActivity::class.java as Class<in Any>?
+    override fun hyperscanprohub(): Class<Any>? {
+        @Suppress("UNCHECKED_CAST")
+        return MainActivity::class.java as Class<Any>
     }
 
-    override fun metaautovault(): List<Class<in Any>?>? {
+    override fun restoremap(): List<Class<Any>> {
+        @Suppress("UNCHECKED_CAST")
         return listOf(
             MainActivity::class.java
-        ) as List<Class<in Any>?>?
+        ) as List<Class<Any>>
     }
 
 }

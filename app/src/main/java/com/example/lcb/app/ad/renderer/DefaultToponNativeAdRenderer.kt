@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.android.common.bill.ads.renderer.ToponNativeAdRenderer
+import com.android.common.bill.ui.topon.ToponNativeAdStyle
 import com.bumptech.glide.Glide
 import com.example.lcb.app.R
 import com.thinkup.nativead.api.TUNativeMaterial
@@ -16,7 +17,7 @@ class DefaultToponNativeAdRenderer(
     private val layoutResId: Int = R.layout.layout_topon_native_ads
 ) : ToponNativeAdRenderer {
 
-    override fun createLayout(context: Context): ViewGroup {
+    override fun createLayout(context: Context, style: ToponNativeAdStyle): ViewGroup {
         return LayoutInflater.from(context)
             .inflate(layoutResId, null) as ViewGroup
     }
