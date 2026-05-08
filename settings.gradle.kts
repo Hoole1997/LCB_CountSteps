@@ -18,6 +18,14 @@ val buildConfig = Properties()
 if (buildConfigFile.exists()) {
     buildConfig.load(buildConfigFile.inputStream())
 }
+
+fun githubCredential(propertyName: String, vararg envNames: String): String? {
+    return buildConfig.getProperty(propertyName)?.trim()?.takeIf { it.isNotEmpty() }
+        ?: envNames.asSequence()
+            .mapNotNull { name -> System.getenv(name)?.trim()?.takeIf { it.isNotEmpty() } }
+            .firstOrNull()
+}
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -35,8 +43,8 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://maven.pkg.github.com/toukaRemax/remax_sdk")
             credentials {
-                username = buildConfig.getProperty("github.user") ?: System.getenv("GITHUB_ACTOR")
-                password = buildConfig.getProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
+                username = githubCredential("github.user", "GH_PACKAGES_USER", "GITHUB_ACTOR")
+                password = githubCredential("github.token", "GH_PACKAGES_TOKEN", "GITHUB_TOKEN")
             }
         }
     }
