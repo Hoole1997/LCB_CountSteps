@@ -11,7 +11,7 @@ class LcbApp : com.stepwise.pedometer.gostep.Rc4w4wk8() {
         var lcbApp: LcbApp? = null
 
         fun backLaunchActivity() {
-            lcbApp?.autocenter()
+            lcbApp?.scanprimeunit()
         }
     }
 
