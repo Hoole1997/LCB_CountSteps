@@ -48,6 +48,10 @@ jobs:
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
+        with:
+          # Gradle transform workspaces are immutable. Reusing a corrupted
+          # restored transform cache can fail before app code is compiled.
+          cache-disabled: true
 
       - name: Ensure google release keystore exists
         id: ensure_keystore
@@ -106,6 +110,17 @@ jobs:
           } >> "$HOME/.gradle/gradle.properties"
           echo "CI gradle.properties:"
           cat "$HOME/.gradle/gradle.properties"
+
+      - name: Reset Gradle transform workspaces
+        run: |
+          set -euo pipefail
+
+          # Do not reuse dependency transform workspaces in CI. A stale
+          # immutable transform, especially from third-party AARs, can break
+          # resource processing with "contents have been modified" errors.
+          find "$HOME/.gradle/caches" \
+            \( -name "transforms" -o -name "transforms-*" \) \
+            -type d -prune -print -exec rm -rf {} + 2>/dev/null || true
 
       - name: Print runner diagnostics
         run: |
