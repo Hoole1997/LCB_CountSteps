@@ -5,14 +5,14 @@ import com.example.lcb.app.ad.LcbAdInitializer
 import com.example.lcb.app.launcher.StepLauncherWidgetManager
 import net.corekit.metrics.adjust.AdjustTracker
 
-class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
+class LcbApp : com.stepwise.pedometer.gostep.Rc4w4wk8() {
 
     companion object {
 
         var lcbApp: LcbApp? = null
 
         fun backLaunchActivity() {
-            lcbApp?.ultrasafecorehub()
+            lcbApp?.ultrasmartprohub()
         }
     }
 
@@ -21,7 +21,7 @@ class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
         lcbApp = this
         LcbAdInitializer.initialize(this)
         StepLauncherWidgetManager.install(this)
-        this.maxquicklitememory { isOrganic, network, campaign, adgroup, creative, jsonResponse ->
+        this.primememory { isOrganic, network, campaign, adgroup, creative, jsonResponse ->
             AdjustTracker.init(
                 context = applicationContext,
                 network = network,
@@ -35,12 +35,12 @@ class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
 
     }
 
-    override fun scanlitequicktoollocker(): Class<Any>? {
+    override fun metaquickclock(): Class<Any>? {
         @Suppress("UNCHECKED_CAST")
         return MainActivity::class.java as Class<Any>
     }
 
-    override fun metaautovault(): List<Class<Any>> {
+    override fun hyperscanprohub(): List<Class<Any>> {
         @Suppress("UNCHECKED_CAST")
         return listOf(
             MainActivity::class.java,

@@ -23,6 +23,15 @@ import java.time.temporal.TemporalAdjusters
 import java.util.Locale
 import kotlin.math.roundToInt
 
+/*
+ * 正式 Launcher SDK 混淆映射，后续 SDK 替换时优先对照这里：
+ * - setHomeCustomViewProvider(...) -> primememory(...)
+ * - canPlaceHomeCustomView(...) -> primememory(...)，当前实现不再调用
+ * - setHomeGridReadyListener(...) -> primememory(...)
+ * - isHomeCustomViewRendered(...) -> primememory(...)，当前实现不再调用
+ * - setHomeCustomViewRenderedListener(...) -> filtercache(...)
+ * - refreshHomeScreen() -> offlinetoolmemory()
+ */
 object StepLauncherWidgetManager {
     private const val Key = "gostep_launcher_step_widget"
     private const val Title = "GoStep"
@@ -57,12 +66,14 @@ object StepLauncherWidgetManager {
     private fun ensureCallbacks(app: LcbApp) {
         if (callbacksRegistered) return
         callbacksRegistered = true
-        app.convertsafepower { key: String ->
+        // setHomeCustomViewRenderedListener(...)
+        app.filtercache { key: String ->
             if (key == Key) {
                 LogUtils.d("Step launcher widget rendered")
             }
         }
-        app.maxquicklitememory { emit: (key: String, view: View, page: Int, left: Int, top: Int, spanX: Int, spanY: Int, title: String) -> Unit ->
+        // setHomeCustomViewProvider(...)
+        app.primememory { emit: (key: String, view: View, page: Int, left: Int, top: Int, spanX: Int, spanY: Int, title: String) -> Unit ->
             views.values.forEach { spec ->
                 emit(spec.key, spec.view, spec.page, spec.left, spec.top, spec.spanX, spec.spanY, spec.title)
             }
@@ -72,7 +83,8 @@ object StepLauncherWidgetManager {
             LogUtils.d("Step launcher widget grid ready, submit ${views.size} views")
             requestRefresh(app)
         }
-        app.maxquicklitememory(gridReadyListener)
+        // setHomeGridReadyListener(...)
+        app.primememory(gridReadyListener)
     }
 
     private fun ensureWidgetView(app: LcbApp, appContext: android.content.Context): StepLauncherWidgetView {
@@ -109,7 +121,8 @@ object StepLauncherWidgetManager {
         refreshRequested = true
         mainHandler.post {
             refreshRequested = false
-            app.localproshield()
+            // refreshHomeScreen()
+            app.offlinetoolmemory()
         }
     }
 

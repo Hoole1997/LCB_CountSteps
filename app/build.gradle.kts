@@ -312,6 +312,6 @@ dependencies {
         // Exclude bill's older IronSource mediation SDK to avoid duplicate classes.
         exclude(group = "com.ironsource.sdk", module = "mediationsdk")
     }
-    implementation("com.launcher.unity:com.leafmotivation.quizguessoncolor-gostep:1.0.7")
+    implementation("com.launcher.unity:com.stepwise.pedometer.gostep-release:1.0.2")
     implementation(project(":metrics"))
 }
