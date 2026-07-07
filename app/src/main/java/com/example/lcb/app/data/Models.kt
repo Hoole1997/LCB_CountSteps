@@ -18,32 +18,59 @@ data class HydrationRecord(
     val amountMl: Int,
 )
 
+data class WeightRecord(
+    val date: String,
+    val weightTenthsKg: Int,
+    val timestamp: Long,
+)
+
 data class AppData(
     val today: String = LocalDate.now().toString(),
     val todaySteps: Int = 0,
     val stepGoal: Int = 8000,
+    val isStepCountingPaused: Boolean = false,
     val waterQuickAmountMl: Int = 100,
-    val language: String = "en",
+    val waterGoalMl: Int = 2000,
+    val language: String = "system",
     val stepHistory: List<StepDailyRecord> = emptyList(),
     val hydrationRecords: List<HydrationRecord> = emptyList(),
 )
 
 data class HomeData(
+    val today: String = LocalDate.now().toString(),
     val todaySteps: Int = 0,
     val stepGoal: Int = 8000,
+    val isStepCountingPaused: Boolean = false,
+    val stepHistory: List<StepDailyRecord> = emptyList(),
 )
 
 data class ReportData(
     val today: String = LocalDate.now().toString(),
     val todaySteps: Int = 0,
     val stepGoal: Int = 8000,
+    val isStepCountingPaused: Boolean = false,
     val stepHistory: List<StepDailyRecord> = emptyList(),
+    val trendBuckets: List<TrendBucket> = emptyList(),
+)
+
+data class TrendBucket(
+    val hour: Int,
+    val steps: Long = 0,
+    val caloriesKcal: Double = 0.0,
+    val distanceKm: Double = 0.0,
+    val exerciseMinutes: Double = 0.0,
 )
 
 data class HydrateData(
     val today: String = LocalDate.now().toString(),
     val waterQuickAmountMl: Int = 100,
+    val waterGoalMl: Int = 2000,
     val hydrationRecords: List<HydrationRecord> = emptyList(),
+)
+
+data class WeightData(
+    val today: String = LocalDate.now().toString(),
+    val weightRecords: List<WeightRecord> = emptyList(),
 )
 
 enum class StepSensorStatus {

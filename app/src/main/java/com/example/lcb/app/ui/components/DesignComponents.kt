@@ -49,7 +49,7 @@ import com.example.lcb.app.ui.theme.LcbTextSecondary
 import com.example.lcb.app.ui.theme.LcbTextTertiary
 import kotlin.math.max
 
-enum class TabDestination { Home, Data }
+enum class TabDestination { Home, Data, Me }
 
 @Composable
 fun ScreenFrame(
@@ -82,12 +82,18 @@ fun AppBottomBar(
     selected: TabDestination,
     onHome: () -> Unit,
     onData: () -> Unit,
+    onMe: () -> Unit = {},
+    dark: Boolean = false,
+    homeLabel: String? = null,
+    dataLabel: String? = null,
+    meLabel: String? = null,
 ) {
+    val background = if (dark) Color(0xFF18181A) else Color.White
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(4.dp, ambientColor = Color(0x14000000), spotColor = Color(0x14000000))
-            .background(Color.White)
+            .background(background)
             .navigationBarsPadding(),
     ) {
         Row(
@@ -98,18 +104,31 @@ fun AppBottomBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             BottomTabItem(
-                label = stringResource(R.string.nav_home),
+                label = homeLabel ?: stringResource(R.string.nav_home),
                 selected = selected == TabDestination.Home,
+                dark = dark,
+                modifier = Modifier.weight(1f),
                 onClick = onHome,
             ) {
                 HomeGlyph(it)
             }
             BottomTabItem(
-                label = stringResource(R.string.nav_data),
+                label = dataLabel ?: stringResource(R.string.nav_data),
                 selected = selected == TabDestination.Data,
+                dark = dark,
+                modifier = Modifier.weight(1f),
                 onClick = onData,
             ) {
                 DataGlyph(it)
+            }
+            BottomTabItem(
+                label = meLabel ?: stringResource(R.string.nav_me),
+                selected = selected == TabDestination.Me,
+                dark = dark,
+                modifier = Modifier.weight(1f),
+                onClick = onMe,
+            ) {
+                MeGlyph(it)
             }
         }
     }
@@ -119,13 +138,19 @@ fun AppBottomBar(
 private fun BottomTabItem(
     label: String,
     selected: Boolean,
+    dark: Boolean,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     icon: @Composable (Color) -> Unit,
 ) {
-    val color = if (selected) LcbTextPrimary else LcbTextTertiary
+    val color = when {
+        selected && dark -> Color.White
+        selected -> LcbTextPrimary
+        dark -> Color(0xFF666666)
+        else -> LcbTextTertiary
+    }
     Column(
-        modifier = Modifier
-            .width(84.dp)
+        modifier = modifier
             .height(44.dp)
             .clickable(onClick = onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -298,7 +323,7 @@ fun HomeGlyph(color: Color, modifier: Modifier = Modifier.size(24.dp)) {
 fun DataGlyph(color: Color, modifier: Modifier = Modifier.size(24.dp)) {
     Canvas(modifier = modifier) {
         val width = size.width * 0.16f
-        listOf(0.32f, 0.58f, 0.82f).forEachIndexed { index, x ->
+        listOf(0.28f, 0.5f, 0.72f).forEachIndexed { index, x ->
             val h = listOf(0.45f, 0.68f, 0.34f)[index] * size.height
             drawRoundRect(
                 color = color,
@@ -307,6 +332,24 @@ fun DataGlyph(color: Color, modifier: Modifier = Modifier.size(24.dp)) {
                 cornerRadius = CornerRadius(width, width),
             )
         }
+    }
+}
+
+@Composable
+fun MeGlyph(color: Color, modifier: Modifier = Modifier.size(24.dp)) {
+    Canvas(modifier = modifier) {
+        drawCircle(
+            color = color,
+            radius = size.minDimension * 0.2f,
+            center = Offset(size.width * 0.5f, size.height * 0.3f),
+        )
+        val body = Path().apply {
+            moveTo(size.width * 0.18f, size.height * 0.86f)
+            cubicTo(size.width * 0.22f, size.height * 0.58f, size.width * 0.36f, size.height * 0.48f, size.width * 0.5f, size.height * 0.48f)
+            cubicTo(size.width * 0.64f, size.height * 0.48f, size.width * 0.78f, size.height * 0.58f, size.width * 0.82f, size.height * 0.86f)
+            close()
+        }
+        drawPath(body, color)
     }
 }
 
@@ -347,14 +390,14 @@ fun ChevronGlyph(color: Color = LcbTextTertiary, modifier: Modifier = Modifier.s
 }
 
 @Composable
-fun BackButton(onClick: () -> Unit) {
+fun BackButton(onClick: () -> Unit, color: Color = LcbTextHeading) {
     Box(
         modifier = Modifier
             .size(44.dp)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        BackGlyph()
+        BackGlyph(color = color)
     }
 }
 

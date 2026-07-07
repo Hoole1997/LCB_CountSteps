@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_hydrate_report"
+        android:icon="@drawable/ic_hydrate_chart"
+        android:title="@string/report_title"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_hydrate_settings"
+        android:icon="@drawable/ic_hydrate_settings"
+        android:title="@string/hydrate_goal_title"
+        app:showAsAction="always" />
+</menu>

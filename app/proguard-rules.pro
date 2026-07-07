@@ -28,6 +28,35 @@
 # Manifest entry points.
 -keep class com.example.lcb.app.LcbApp { *; }
 -keep class com.example.lcb.app.MainActivity { *; }
+-keep class com.example.lcb.app.HydrateActivity { *; }
+-keep class com.example.lcb.app.ReportDetailActivity { *; }
+-keep class com.example.lcb.app.HydrateReportActivity { *; }
+-keep class com.example.lcb.app.AchievementActivity { *; }
+
+# AndroidX can restore Fragments/DialogFragments from saved class names after
+# process death. Keep app-owned fragment names and default constructors stable.
+-keep class com.example.lcb.app.HomeFragment { *; }
+-keep class com.example.lcb.app.TrendsFragment { *; }
+-keep class com.example.lcb.app.MeFragment { *; }
+-keep class com.example.lcb.app.ui.sheets.** extends androidx.fragment.app.Fragment { *; }
+-keep class com.example.lcb.app.ui.sheets.** extends androidx.fragment.app.DialogFragment { *; }
+-keep class com.example.lcb.app.ui.sheets.** extends com.google.android.material.bottomsheet.BottomSheetDialogFragment { *; }
+
+# ViewModelProvider creates AndroidViewModel instances through constructors.
+-keep class com.example.lcb.app.LcbAppViewModel { *; }
+
+# XML inflation and launcher custom view provider use class names / public
+# constructors. Keep app custom views stable for release resource inflation.
+-keep class com.example.lcb.app.ui.hydrate.HydrateHeaderBackgroundView { *; }
+-keep class com.example.lcb.app.ui.hydrate.WaterDropWaveView { *; }
+-keep class com.example.lcb.app.ui.hydrate.AddWaterIconView { *; }
+-keep class com.example.lcb.app.ui.sheets.WeightWheelPickerView { *; }
+-keep class com.example.lcb.app.launcher.StepLauncherWidgetView { *; }
+-keep class com.example.lcb.app.launcher.StepLauncherWidgetManager { *; }
+
+# Keep enum names used across Intent extras, saved UI state, or string valueOf.
+-keep enum com.example.lcb.app.ui.components.TabDestination { *; }
+-keep enum com.example.lcb.app.ui.report.ReportMetricType { *; }
 
 # Classes marked with @Keep should remain stable if added later.
 -keep @androidx.annotation.Keep class * { *; }
@@ -45,6 +74,8 @@
 -keep class com.example.lcb.app.data.LcbDatabase_Impl { *; }
 -keep class com.example.lcb.app.data.DailyStepEntity { *; }
 -keep class com.example.lcb.app.data.HydrationRecordEntity { *; }
+-keep class com.example.lcb.app.data.WeightRecordEntity { *; }
+-keep class com.example.lcb.app.data.HourlyStepEntity { *; }
 -keep interface com.example.lcb.app.data.*Dao { *; }
 -keep class com.example.lcb.app.data.*Dao_Impl { *; }
 

@@ -14,6 +14,7 @@ import com.example.lcb.app.data.HydrateData
 import com.example.lcb.app.data.ReportData
 import com.example.lcb.app.data.StepSensorRepository
 import com.example.lcb.app.data.StepSensorStatus
+import com.example.lcb.app.data.WeightData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +34,7 @@ class LcbAppViewModel(application: Application) : AndroidViewModel(application) 
     val language: StateFlow<String> = preferences.language.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = "en",
+        initialValue = "system",
     )
 
     val homeData: StateFlow<HomeData> = preferences.homeData.stateIn(
@@ -54,6 +55,12 @@ class LcbAppViewModel(application: Application) : AndroidViewModel(application) 
         initialValue = HydrateData(),
     )
 
+    val weightData: StateFlow<WeightData> = preferences.weightData.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = WeightData(),
+    )
+
     val sensorStatus: StateFlow<StepSensorStatus> = stepSensorRepository.status
 
     init {
@@ -64,6 +71,10 @@ class LcbAppViewModel(application: Application) : AndroidViewModel(application) 
         stepSensorRepository.start(hasActivityRecognitionPermission())
     }
 
+    fun deactivateStepSensor() {
+        stepSensorRepository.stop()
+    }
+
     fun onPermissionResult() {
         stepSensorRepository.start(hasActivityRecognitionPermission())
     }
@@ -72,12 +83,32 @@ class LcbAppViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch(Dispatchers.IO) { preferences.addWater(amountMl) }
     }
 
+    fun setWaterGoalMl(goalMl: Int) {
+        viewModelScope.launch(Dispatchers.IO) { preferences.setWaterGoalMl(goalMl) }
+    }
+
+    fun setWeightForDate(date: String, weightTenthsKg: Int) {
+        viewModelScope.launch(Dispatchers.IO) { preferences.setWeightForDate(date, weightTenthsKg) }
+    }
+
     fun setLanguage(language: String) {
         viewModelScope.launch(Dispatchers.IO) { preferences.setLanguage(language) }
     }
 
     fun setStepGoal(goal: Int) {
         viewModelScope.launch(Dispatchers.IO) { preferences.setStepGoal(goal) }
+    }
+
+    fun setStepCountingPaused(paused: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) { preferences.setStepCountingPaused(paused) }
+    }
+
+    fun setTodaySteps(steps: Int) {
+        viewModelScope.launch(Dispatchers.IO) { preferences.setTodaySteps(steps) }
+    }
+
+    fun setStepsForDate(date: String, steps: Int) {
+        viewModelScope.launch(Dispatchers.IO) { preferences.setStepsForDate(date, steps) }
     }
 
     fun hasActivityRecognitionPermission(): Boolean {

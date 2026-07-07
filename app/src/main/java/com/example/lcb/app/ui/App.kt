@@ -2,7 +2,6 @@ package com.example.lcb.app.ui
 
 import android.Manifest
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -27,24 +26,20 @@ import androidx.compose.ui.zIndex
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
+import com.example.lcb.app.HydrateActivity
 import com.example.lcb.app.LcbAppViewModel
+import com.example.lcb.app.AchievementActivity
 import com.example.lcb.app.ui.home.HomeScreen
-import com.example.lcb.app.ui.hydrate.HydrateScreen
 import com.example.lcb.app.ui.report.ReportScreen
-import com.example.lcb.app.ui.settings.SettingsScreen
 import com.example.lcb.app.ui.theme.LcbTheme
 import com.example.lcb.app.utils.loadInterstitial
 import net.corekit.core.report.ReportDataManager
 
 private object Routes {
     const val Home = "home"
-    const val Hydrate = "hydrate"
-    const val Settings = "settings"
 }
 
 private enum class MainTab { Home, Data }
@@ -59,7 +54,7 @@ fun LcbStepsApp(viewModel: LcbAppViewModel = viewModel()) {
     val interstitialGate = remember { InterstitialGate() }
     val baseConfiguration = LocalConfiguration.current
     val language by viewModel.language.collectAsStateWithLifecycle()
-    val localizedContext = remember(context, language) {
+    val localizedContext = remember(context, language, baseConfiguration) {
         context.localizedContext(language)
     }
     val localizedConfiguration = remember(baseConfiguration, language) {
@@ -98,11 +93,15 @@ fun LcbStepsApp(viewModel: LcbAppViewModel = viewModel()) {
                     val homeData by viewModel.homeData.collectAsStateWithLifecycle()
                     val sensorStatus by viewModel.sensorStatus.collectAsStateWithLifecycle()
                     val reportData by viewModel.reportData.collectAsStateWithLifecycle()
+                    val hydrateData by viewModel.hydrateData.collectAsStateWithLifecycle()
+                    val weightData by viewModel.weightData.collectAsStateWithLifecycle()
 
                     Box(modifier = Modifier.fillMaxSize()) {
                         KeepAliveMainTab(visible = selectedMainTab == MainTab.Home) {
                             HomeScreen(
                                 data = homeData,
+                                hydrateData = hydrateData,
+                                weightData = weightData,
                                 sensorStatus = sensorStatus,
                                 active = selectedMainTab == MainTab.Home,
                                 onRequestPermission = {
@@ -110,11 +109,7 @@ fun LcbStepsApp(viewModel: LcbAppViewModel = viewModel()) {
                                         permissionLauncher.launch(Manifest.permission.ACTIVITY_RECOGNITION)
                                     }
                                 },
-                                onSettings = {
-                                    navController.navigate(Routes.Settings) {
-                                        launchSingleTop = true
-                                    }
-                                },
+                                onSettings = {},
                                 onHome = {
                                     reportClick("click_tab_home", "page" to "home")
                                 },
@@ -126,12 +121,21 @@ fun LcbStepsApp(viewModel: LcbAppViewModel = viewModel()) {
                                 onHydrate = {
                                     reportClick("click_enter_hydrate", "from" to "home")
                                     activity.showInterstitialThen(interstitialGate) {
-                                        navController.navigate(Routes.Hydrate) {
-                                            launchSingleTop = true
-                                        }
+                                        context.startActivity(Intent(context, HydrateActivity::class.java))
                                     }
                                 },
-                                onSetGoal = viewModel::setStepGoal,
+                                onAddWater = { amount ->
+                                    reportClick("click_drink_water", "from" to "home", "amount_ml" to amount)
+                                    viewModel.addWater(amount)
+                                },
+                                onSetStepGoal = viewModel::setStepGoal,
+                                onSetStepCountingPaused = viewModel::setStepCountingPaused,
+                                onSetStepsForDate = viewModel::setStepsForDate,
+                                onSetWeightForDate = viewModel::setWeightForDate,
+                                onAchievements = {
+                                    reportClick("click_enter_achievements", "from" to "home")
+                                    context.startActivity(AchievementActivity.createIntent(context))
+                                },
                             )
                         }
                         if (dataTabVisited) {
@@ -150,43 +154,6 @@ fun LcbStepsApp(viewModel: LcbAppViewModel = viewModel()) {
                             }
                         }
                     }
-                }
-                composable(
-                    route = "${Routes.Hydrate}?date={date}",
-                    arguments = listOf(navArgument("date") {
-                        type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
-                    }),
-                ) {
-                    val hydrateData by viewModel.hydrateData.collectAsStateWithLifecycle()
-                    HydrateScreen(
-                        data = hydrateData,
-                        onBack = { navController.popBackStack() },
-                        onDrink = { amount ->
-                            reportClick("click_drink_water", "amount_ml" to amount)
-                            viewModel.addWater(amount)
-                        },
-                    )
-                }
-                composable(Routes.Settings) {
-                    val currentLanguage by viewModel.language.collectAsStateWithLifecycle()
-                    SettingsScreen(
-                        language = currentLanguage,
-                        onBack = { navController.popBackStack() },
-                        onLanguageSelected = viewModel::setLanguage,
-                        onFeedback = {
-                            val intent = Intent(Intent.ACTION_SENDTO).apply {
-                                data = Uri.parse("mailto:walaa98alhasan@gmail.com")
-                                putExtra(Intent.EXTRA_SUBJECT, "Count Steps feedback")
-                            }
-                            runCatching { context.startActivity(intent) }
-                        },
-                        onPrivacyPolicy = {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://walaa98alhasan.com/privacy.html"))
-                            runCatching { context.startActivity(intent) }
-                        },
-                    )
                 }
             }
         }

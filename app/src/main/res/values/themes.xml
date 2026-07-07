@@ -6,4 +6,11 @@
     </style>
 
     <style name="Theme.LCB_Template" parent="Base.Theme.LCB_Template" />
+
+    <style name="TextAppearance.Lcb.SettingsToolbarTitle" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
 </resources>

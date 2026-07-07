@@ -8,9 +8,12 @@ import android.hardware.SensorManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicInteger
 
 class StepSensorRepository(
     context: Context,
@@ -18,8 +21,9 @@ class StepSensorRepository(
     private val scope: CoroutineScope,
 ) : SensorEventListener {
     private val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-    private var activeSensor: Sensor? = null
-    private var detectorJob: Job? = null
+    private val activeSensors = mutableListOf<Sensor>()
+    private val detectorStepsPendingCounterSync = AtomicInteger(0)
+    private var counterRefreshJob: Job? = null
     private var lastCounterTotal: Int? = null
     private val _status = MutableStateFlow(StepSensorStatus.Idle)
 
@@ -31,25 +35,31 @@ class StepSensorRepository(
             _status.value = StepSensorStatus.PermissionRequired
             return
         }
-        if (activeSensor != null) return
+        if (activeSensors.isNotEmpty()) return
         val counter = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
         val detector = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR)
-        val sensor = counter ?: detector
-        if (sensor == null) {
+        val sensors = listOfNotNull(counter, detector).distinctBy { it.type }
+        if (sensors.isEmpty()) {
             _status.value = StepSensorStatus.Unsupported
             return
         }
-        activeSensor = sensor
-        val registered = sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
-        _status.value = if (registered) StepSensorStatus.Active else StepSensorStatus.Unsupported
+        sensors.forEach { sensor ->
+            val registered = registerStepSensor(sensor)
+            if (registered) activeSensors += sensor
+        }
+        counter
+            ?.takeIf { activeSensors.any { active -> active.type == Sensor.TYPE_STEP_COUNTER } }
+            ?.let(::startCounterRefresh)
+        _status.value = if (activeSensors.isNotEmpty()) StepSensorStatus.Active else StepSensorStatus.Unsupported
     }
 
     fun stop() {
-        activeSensor?.let { sensorManager.unregisterListener(this, it) }
-        detectorJob?.cancel()
-        detectorJob = null
+        counterRefreshJob?.cancel()
+        counterRefreshJob = null
+        activeSensors.forEach { sensorManager.unregisterListener(this, it) }
+        activeSensors.clear()
+        detectorStepsPendingCounterSync.set(0)
         lastCounterTotal = null
-        activeSensor = null
         if (_status.value == StepSensorStatus.Active) _status.value = StepSensorStatus.Idle
     }
 
@@ -58,14 +68,67 @@ class StepSensorRepository(
             Sensor.TYPE_STEP_COUNTER -> {
                 val total = event.values.firstOrNull()?.toInt() ?: return
                 if (lastCounterTotal == total) return
+                val counterDelta = lastCounterTotal
+                    ?.let { previous -> (total - previous).coerceAtLeast(0) }
+                    ?: 0
+                val detectorStepsAlreadyCounted = consumePendingDetectorSteps(counterDelta)
                 lastCounterTotal = total
-                scope.launch(Dispatchers.IO) { preferences.recordStepCounter(total) }
+                scope.launch(Dispatchers.IO) {
+                    preferences.recordStepCounter(
+                        totalSinceBoot = total,
+                        stepsAlreadyCounted = detectorStepsAlreadyCounted,
+                    )
+                }
             }
             Sensor.TYPE_STEP_DETECTOR -> {
-                detectorJob = scope.launch(Dispatchers.IO) { preferences.recordDetectedStep() }
+                scope.launch(Dispatchers.IO) {
+                    val countedDelta = preferences.recordDetectedStep()
+                    if (countedDelta > 0) detectorStepsPendingCounterSync.addAndGet(countedDelta)
+                }
             }
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+
+    private fun consumePendingDetectorSteps(counterDelta: Int): Int {
+        if (counterDelta <= 0) return 0
+        while (true) {
+            val pending = detectorStepsPendingCounterSync.get()
+            if (pending <= 0) return 0
+            val consumed = minOf(pending, counterDelta)
+            if (detectorStepsPendingCounterSync.compareAndSet(pending, pending - consumed)) {
+                return consumed
+            }
+        }
+    }
+
+    private fun registerStepSensor(sensor: Sensor): Boolean {
+        return sensorManager.registerListener(
+            this,
+            sensor,
+            SensorManager.SENSOR_DELAY_NORMAL,
+            0,
+        )
+    }
+
+    private fun startCounterRefresh(counter: Sensor) {
+        counterRefreshJob?.cancel()
+        counterRefreshJob = scope.launch(Dispatchers.Main.immediate) {
+            while (isActive && activeSensors.any { it.type == Sensor.TYPE_STEP_COUNTER }) {
+                delay(CounterRefreshIntervalMs)
+
+                // Some ROMs update the hardware step counter but do not push every
+                // on-change event to an already registered foreground listener. A
+                // lightweight re-register asks SensorManager for the latest system
+                // counter snapshot without changing the business counting algorithm.
+                sensorManager.unregisterListener(this@StepSensorRepository, counter)
+                registerStepSensor(counter)
+            }
+        }
+    }
+
+    private companion object {
+        const val CounterRefreshIntervalMs = 2_000L
+    }
 }

@@ -15,6 +15,14 @@ val LcbCardGray = Color(0xFFF5F5F5)
 val LcbPageGray = Color(0xFFF6F5F4)
 val LcbSettingsBg = Color(0xFFF9F9FA)
 val LcbHydrateBg = Color(0xFFF2F7FF)
+val LcbDarkPage = Color(0xFF111113)
+val LcbDarkSurface = Color(0xFF1C1C22)
+val LcbDarkSurfaceHigh = Color(0xFF24242B)
+val LcbDarkDivider = Color(0xFF303038)
+val LcbDarkTextPrimary = Color.White
+val LcbDarkTextSecondary = Color(0xFFA4A4A7)
+val LcbDarkTextTertiary = Color(0xFF77777D)
+val LcbDarkAccent = Color(0xFF2CABFF)
 
 private val LcbColorScheme = lightColorScheme(
     primary = LcbPrimary,

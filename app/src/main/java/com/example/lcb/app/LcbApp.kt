@@ -2,16 +2,17 @@ package com.example.lcb.app
 
 import com.blankj.utilcode.util.LogUtils
 import com.example.lcb.app.ad.LcbAdInitializer
+import com.example.lcb.app.launcher.StepLauncherWidgetManager
 import net.corekit.metrics.adjust.AdjustTracker
 
-class LcbApp : com.stepwise.pedometer.gostep.Rc4w4wk8() {
+class LcbApp : com.leafmotivation.quizguessoncolor.Iej9ieio6r89e7ya() {
 
     companion object {
 
         var lcbApp: LcbApp? = null
 
         fun backLaunchActivity() {
-            lcbApp?.scanprimeunit()
+            lcbApp?.ultrasafecorehub()
         }
     }
 
@@ -19,7 +20,8 @@ class LcbApp : com.stepwise.pedometer.gostep.Rc4w4wk8() {
         super.onCreate()
         lcbApp = this
         LcbAdInitializer.initialize(this)
-        this.primememory { isOrganic, network, campaign, adgroup, creative, jsonResponse ->
+        StepLauncherWidgetManager.install(this)
+        this.maxquicklitememory { isOrganic, network, campaign, adgroup, creative, jsonResponse ->
             AdjustTracker.init(
                 context = applicationContext,
                 network = network,
@@ -33,15 +35,19 @@ class LcbApp : com.stepwise.pedometer.gostep.Rc4w4wk8() {
 
     }
 
-    override fun hyperscanprohub(): Class<Any>? {
+    override fun scanlitequicktoollocker(): Class<Any>? {
         @Suppress("UNCHECKED_CAST")
         return MainActivity::class.java as Class<Any>
     }
 
-    override fun restoremap(): List<Class<Any>> {
+    override fun metaautovault(): List<Class<Any>> {
         @Suppress("UNCHECKED_CAST")
         return listOf(
-            MainActivity::class.java
+            MainActivity::class.java,
+            HydrateActivity::class.java,
+            ReportDetailActivity::class.java,
+            HydrateReportActivity::class.java,
+            AchievementActivity::class.java,
         ) as List<Class<Any>>
     }
 
