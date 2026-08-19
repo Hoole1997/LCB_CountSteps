@@ -1,5 +1,6 @@
 package com.example.lcb.app
 
+import android.app.Activity
 import com.blankj.utilcode.util.LogUtils
 import com.example.lcb.app.ad.LcbAdInitializer
 import com.example.lcb.app.launcher.StepLauncherWidgetManager
@@ -13,6 +14,10 @@ class LcbApp : com.stepwise.pedometer.gostep.Rc4w4wk8() {
 
         fun backLaunchActivity() {
             lcbApp?.ultrasmartprohub()
+        }
+
+        fun fixAdBug(activity: Activity) {
+            lcbApp?.primememory(activity,"",-1)
         }
     }
 
