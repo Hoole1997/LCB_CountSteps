@@ -122,7 +122,7 @@ object StepLauncherWidgetManager {
         mainHandler.post {
             refreshRequested = false
             // refreshHomeScreen()
-            app.offlinetoolmemory()
+//            app.offlinetoolmemory()
         }
     }
 
