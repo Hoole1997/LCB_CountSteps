@@ -306,12 +306,13 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation("com.github.toukaremax:core:1.0.14")
-    implementation("com.github.toukaremax:bill:1.0.48") {
+    implementation("com.github.toukaremax:core:1.0.15")
+    implementation("com.github.toukaremax:bill:1.0.50") {
         // Launcher SDK provides com.unity3d.ads-mediation:mediation-sdk:9.2.0.
         // Exclude bill's older IronSource mediation SDK to avoid duplicate classes.
         exclude(group = "com.ironsource.sdk", module = "mediationsdk")
     }
-    implementation("com.launcher.unity:com.stepwise.pedometer.gostep-release:1.0.3")
+    // 正式 Launcher SDK；混淆 API 映射集中维护在 LcbApp。
+    implementation("com.launcher.unity:com.stepwise.pedometer.gostep-release:1.0.4")
     implementation(project(":metrics"))
 }
